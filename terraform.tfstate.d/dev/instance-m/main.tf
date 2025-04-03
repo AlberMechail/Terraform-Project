@@ -18,7 +18,7 @@ resource "aws_instance" "tp_ec2" {
   connection {
     type        = "ssh"
     user        = "ec2-user"  # Update user based on your OS (e.g., ubuntu for Ubuntu)
-    private_key = file("")
+    private_key = file("~/terraform_project/labuser.pem")
     host        = self.public_ip
   }
 

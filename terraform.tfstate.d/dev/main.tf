@@ -41,17 +41,36 @@ module "az2_privatesubnet" {
   
 }
 
-
-data "aws_ami" "this" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "architecture"
-    values = ["arm64"]
-  }
-  filter {
-    name   = "name"
-    values = ["al2023-ami-2023*"]
-  }
+module "igw" {
+  source = "./igw-m"
+  igw_vpc_id = module.vpc.tp_output_vpcid
+  igw_name = "tp-igw"
 }
 
+module "public_routetable" {
+  source = "./routingt-m"
+  tp_rt_vpcid = module.vpc.tp_output_vpcid
+  rt_routes = [ 
+    {
+        cidr_block = "0.0.0.0/24"
+        gateway_id = module.igw.igw_output_id
+
+    }
+   ]
+
+   tp_rt_name = "public_routetable"
+}
+
+module "associate_routetable_az1" {
+    source = "./associatert-m"
+    assrt_subnetid = module.az1_publicsubnet.subnet_outputid
+    assrt_routetableid = module.public_routetable.tp_routingtable_outputid
+
+}
+
+module "associate_routetable_az2" {
+    source = "./associatert-m"
+    assrt_subnetid = module.az2_publicsubnet.subnet_outputid
+    assrt_routetableid = module.public_routetable.tp_routingtable_outputid
+
+}
