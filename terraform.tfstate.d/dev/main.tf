@@ -41,11 +41,6 @@ module "az2_privatesubnet" {
   
 }
 
-module "backend_s3_bucket" {
-  source = "./s3-m"
-  s3bucket_name = "tp_backend"
-  s3environment = "TProject"
-}
 
 data "aws_ami" "this" {
   most_recent = true
