@@ -74,3 +74,75 @@ module "associate_routetable_az2" {
     assrt_routetableid = module.public_routetable.tp_routingtable_outputid
 
 }
+
+module "securitygroup_publicsub" {
+  source = "./sg-m"
+  sg_name = "public-sg"
+  sg_vpcid = module.vpc.tp_output_vpcid
+
+  sg_ingress_rules = [ {
+    from_port = 80
+    to_port = 80
+    protocol = tcp
+    cidr_blocks = "0.0.0.0/24"
+  },
+  {
+    from_port = 443
+    to_port = 443
+    protocol = tcp
+    cidr_blocks = "0.0.0.0/24"
+  },{
+    from_port = 22
+    to_port = 22
+    protocol = tcp
+    cidr_blocks = "0.0.0.0/24"
+  }
+  ]
+}
+
+data "aws_ami" "amazon_linux" {
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*"] # Pattern for Amazon Linux 2 AMIs
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"] # Specify architecture (e.g., x86_64 or arm64)
+  }
+
+  filter {
+    name   = "owner-id"
+    values = ["137112412989"] # Amazon's official owner ID for Amazon Linux
+  }
+
+  filter {
+    name   = "state"
+    values = ["available"]
+  }
+
+  most_recent = true
+}
+
+
+module "az1_public_ec2" {
+  source = "./instance-m"
+  tp_ec2_ami = data.aws_ami.amazon_linux.id
+  tp_ec2_instancetype = "t2.micro"
+  ec2_subnetid = module.az1_publicsubnet.subnet_outputid
+  ec2_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
+  ec2_associatepublicip = "10.0.0.100/24"
+  ec2_name = "AZ1_public_ApacheServer"
+  
+}
+
+module "az2_public_ec2" {
+  source = "./instance-m"
+  tp_ec2_ami = data.aws_ami.amazon_linux.id
+  tp_ec2_instancetype = "t2.micro"
+  ec2_subnetid = module.az2_publicsubnet.subnet_outputid
+  ec2_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
+  ec2_associatepublicip = "10.0.2.100/24"
+  ec2_name = "AZ1_public_ApacheServer"
+  
+}
