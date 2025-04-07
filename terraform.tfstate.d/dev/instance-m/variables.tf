@@ -11,7 +11,7 @@ variable "ec2_subnetid" {
 }
 
 variable "ec2_securitygroup" {
-  type = list()
+  type = string
 }
 
 variable "ec2_associatepublicip" {
