@@ -12,6 +12,7 @@ resource "aws_instance" "tp_ec2" {
   # Log public IPs to all-ips.txt
   provisioner "local-exec" {
     command = "echo ${var.ec2_name} ${self.public_ip} >> ~/.aws/all-ips.txt"
+    
   }
 
   # Remote execution to install Apache or proxy
@@ -31,4 +32,10 @@ resource "aws_instance" "tp_ec2" {
     ]
   }
 
+  }
+
+  resource "aws_lb_target_group_attachment" "attach_lb_toInstance" {
+    target_group_arn = var.ec2_target_group_arn
+    target_id        = aws_instance.tp_ec2.id
+    port             = 80
   }

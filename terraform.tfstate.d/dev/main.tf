@@ -125,6 +125,17 @@ data "aws_ami" "amazon_linux" {
 }
 
 
+module "Alb_publicsubnet" {
+  source = "./loadbalancer-m"
+  lb_name = "Alb-for-public-subnet"
+  lb_isinternal = false
+  lb_securitygroup = module.securitygroup_publicsub.tp_securitygroup_outputid
+  lb_subnets = [module.az1_publicsubnet.subnet_outputid,module.az2_publicsubnet.subnet_outputid]
+  lbtarget_vpc_id = module.vpc.tp_output_vpcid
+  lb_type = "application"
+
+}
+
 module "az1_public_ec2" {
   source = "./instance-m"
   tp_ec2_ami = data.aws_ami.amazon_linux.id
@@ -133,6 +144,7 @@ module "az1_public_ec2" {
   ec2_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
   ec2_associatepublicip = "10.0.0.100/24"
   ec2_name = "AZ1_public_ApacheServer"
+  ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
   
 }
 
@@ -144,5 +156,6 @@ module "az2_public_ec2" {
   ec2_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
   ec2_associatepublicip = "10.0.2.100/24"
   ec2_name = "AZ1_public_ApacheServer"
+  ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
   
 }
