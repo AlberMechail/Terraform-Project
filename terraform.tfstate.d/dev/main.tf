@@ -133,6 +133,10 @@ module "Alb_publicsubnet" {
   lb_subnets = [module.az1_publicsubnet.subnet_outputid,module.az2_publicsubnet.subnet_outputid]
   lbtarget_vpc_id = module.vpc.tp_output_vpcid
   lb_type = "application"
+  lb_listner_port = 80
+  lb_target_group_port = 80
+  lb_listner_protocol = "HTTP"
+  lb_target_group_protocol = "HTTP"
 
 }
 
@@ -145,7 +149,7 @@ module "az1_public_ec2" {
   ec2_associatepublicip = "10.0.0.100/24"
   ec2_name = "AZ1_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
-  
+
 }
 
 module "az2_public_ec2" {
@@ -158,4 +162,18 @@ module "az2_public_ec2" {
   ec2_name = "AZ1_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
   
+}
+
+module "NLB_privatesubnets" {
+  source = "./loadbalancer-m"
+  lb_name = "Nlb-for-private-subnet"
+  lb_isinternal = true
+  lb_securitygroup = module.securitygroup_publicsub.tp_securitygroup_outputid
+  lb_subnets = [module.az1_publicsubnet.subnet_outputid,module.az2_publicsubnet.subnet_outputid]
+  lbtarget_vpc_id = module.vpc.tp_output_vpcid
+  lb_type = "network"
+  lb_listner_port = 22
+  lb_target_group_port = 22
+  lb_listner_protocol = "TCP"
+  lb_target_group_protocol = "TCP"
 }

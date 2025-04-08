@@ -7,7 +7,7 @@ resource "aws_lb" "tp_loadbalancer" {
 
   enable_deletion_protection = true
   enable_cross_zone_load_balancing = true
-  enable_http2      = true
+  enable_http2      = true 
 
   access_logs {
     bucket  = aws_s3_bucket.lb_logs.id
@@ -22,8 +22,8 @@ resource "aws_lb" "tp_loadbalancer" {
 
 resource "aws_lb_target_group" "target_group" {
   name     = "tp_public_targetgroup"
-  port     = 80
-  protocol = "HTTP"
+  port     = var.lb_target_group_port
+  protocol = var.lb_target_group_protocol
   vpc_id   = var.lbtarget_vpc_id
   health_check {
     path = "/"
@@ -34,10 +34,10 @@ resource "aws_lb_target_group" "target_group" {
   }
 }
 
-resource "aws_lb_listener" "http" {
+resource "aws_lb_listener" "listner" {
   load_balancer_arn = aws_lb.tp_loadbalancer.arn
-  port              = 80
-  protocol          = "HTTP"
+  port              = var.lb_listner_port
+  protocol          = var.lb_listner_protocol
 
   default_action {
     target_group_arn = aws_lb_target_group.target_group.arn
