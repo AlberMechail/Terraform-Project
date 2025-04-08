@@ -159,9 +159,28 @@ module "az2_public_ec2" {
   ec2_subnetid = module.az2_publicsubnet.subnet_outputid
   ec2_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
   ec2_associatepublicip = "10.0.2.100/24"
-  ec2_name = "AZ1_public_ApacheServer"
+  ec2_name = "AZ2_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
   
+}
+
+
+#########################
+#Private Zone
+#########################
+
+module "securitygroup_privatesub" {
+  source = "./sg-m"
+  sg_name = "private-sg"
+  sg_vpcid = module.vpc.tp_output_vpcid
+
+  sg_ingress_rules = [ {
+    from_port = 22
+    to_port = 22
+    protocol = tcp
+    cidr_blocks = ["10.0.0.0/24","10.0.2.0/24"]
+  }
+  ]
 }
 
 module "NLB_privatesubnets" {
@@ -176,4 +195,28 @@ module "NLB_privatesubnets" {
   lb_target_group_port = 22
   lb_listner_protocol = "TCP"
   lb_target_group_protocol = "TCP"
+}
+
+module "az1_private_ec2" {
+  source = "./instance-m"
+  tp_ec2_ami = data.aws_ami.amazon_linux.id
+  tp_ec2_instancetype = "t2.micro"
+  ec2_subnetid = module.az1_pprivatesubnet.subnet_outputid
+  ec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
+  ec2_associatepublicip = "10.0.1.100/24"
+  ec2_name = "AZ1_private_BackendServer"
+  ec2_target_group_arn = module.Alb_privatesubnet.alb_arn_output
+
+}
+
+module "az2_private_ec2" {
+  source = "./instance-m"
+  tp_ec2_ami = data.aws_ami.amazon_linux.id
+  tp_ec2_instancetype = "t2.micro"
+  ec2_subnetid = module.az2_privatesubnet.subnet_outputid
+  ec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
+  ec2_associatepublicip = "10.0.3.100/24"
+  ec2_name = "AZ2_private_BackendServer"
+  ec2_target_group_arn = module.Alb_privatesubnet.alb_arn_output
+  
 }

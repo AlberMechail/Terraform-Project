@@ -16,3 +16,16 @@ variable "lb_type" {
 variable "lbtarget_vpc_id" {
   type = string
 }
+variable "lb_target_group_port" {
+  type = number
+}
+variable "lb_target_group_protocol" {
+  type = string
+}
+
+variable "lb_listner_port" {
+  type = number
+}
+variable "lb_listner_protocol" {
+  type = string
+}
