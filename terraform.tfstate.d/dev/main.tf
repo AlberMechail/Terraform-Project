@@ -149,6 +149,8 @@ module "az1_public_ec2" {
   ec2_associatepublicip = "10.0.0.100/24"
   ec2_name = "AZ1_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
+  enable_local_exec = true
+  enable_remote_exec = true
 
 }
 
@@ -161,7 +163,8 @@ module "az2_public_ec2" {
   ec2_associatepublicip = "10.0.2.100/24"
   ec2_name = "AZ2_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
-  
+  enable_local_exec = true
+  enable_remote_exec = true
 }
 
 
