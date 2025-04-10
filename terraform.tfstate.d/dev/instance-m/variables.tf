@@ -29,6 +29,6 @@ variable "ec2_target_group_arn" {
 variable "private_key_path" {
   description = "Path to the SSH private key for remote-exec."
   type        = string
-  default = "~/Downloads/labuser.pem"
+  default = "/home/albermechail/Downloads/labuser.pem"
 }
 
