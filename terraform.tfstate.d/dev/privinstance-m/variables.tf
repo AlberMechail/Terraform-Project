@@ -1,28 +1,28 @@
-variable "tp_ec2_ami" {
+variable "tp_privateec2_ami" {
   type = string
 }
 
-variable "tp_ec2_instancetype" {
+variable "tp_privateec2_instancetype" {
   type = string
 }
 
-variable "ec2_subnetid" {
+variable "privateec2_subnetid" {
   type = string
 }
 
-variable "ec2_securitygroup" {
+variable "privateec2_securitygroup" {
   type = list(string)
 }
 
-variable "ec2_associatepublicip" {
+variable "privateec2_associatepublicip" {
   type = bool
 }
 
-variable "ec2_name" {
+variable "privateec2_name" {
   type = string
 }
 
-variable "ec2_target_group_arn" {
+variable "privateec2_target_group_arn" {
   type = string
 }
 

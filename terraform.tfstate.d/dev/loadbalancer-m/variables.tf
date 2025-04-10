@@ -13,6 +13,9 @@ variable "lb_subnets" {
 variable "lb_type" {
   type = string
 }
+variable "lb_targetgroup_name" {
+  type = string
+}
 variable "lbtarget_vpc_id" {
   type = string
 }

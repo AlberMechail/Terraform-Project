@@ -9,19 +9,13 @@ resource "aws_lb" "tp_loadbalancer" {
   enable_cross_zone_load_balancing = true
   enable_http2      = true 
 
-  access_logs {
-    bucket  = aws_s3_bucket.lb_logs.id
-    prefix  = "test-lb"
-    enabled = true
-  }
-
   tags = {
     Environment = "production"
   }
 }
 
 resource "aws_lb_target_group" "target_group" {
-  name     = "tp_public_targetgroup"
+  name     = var.lb_targetgroup_name
   port     = var.lb_target_group_port
   protocol = var.lb_target_group_protocol
   vpc_id   = var.lbtarget_vpc_id

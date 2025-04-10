@@ -84,18 +84,18 @@ module "securitygroup_publicsub" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = "0.0.0.0/24"
+    cidr_blocks = ["0.0.0.0/24"]
   },
   {
     from_port = 443
     to_port = 443
     protocol = "tcp"
-    cidr_blocks = "0.0.0.0/24"
+    cidr_blocks = ["0.0.0.0/24"]
   },{
     from_port = 22
     to_port = 22
     protocol = "tcp"
-    cidr_blocks = "0.0.0.0/24"
+    cidr_blocks = ["0.0.0.0/24"]
   }
   ]
 }
@@ -129,7 +129,8 @@ module "Alb_publicsubnet" {
   source = "./loadbalancer-m"
   lb_name = "Alb-for-public-subnet"
   lb_isinternal = false
-  lb_securitygroup = module.securitygroup_publicsub.tp_securitygroup_outputid
+  lb_targetgroup_name = "public-target-group"
+  lb_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
   lb_subnets = [module.az1_publicsubnet.subnet_outputid,module.az2_publicsubnet.subnet_outputid]
   lbtarget_vpc_id = module.vpc.tp_output_vpcid
   lb_type = "application"
@@ -149,8 +150,6 @@ module "az1_public_ec2" {
   ec2_associatepublicip = true
   ec2_name = "AZ1_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
-  enable_local_exec = true
-  enable_remote_exec = true
 
 }
 
@@ -163,8 +162,6 @@ module "az2_public_ec2" {
   ec2_associatepublicip = true
   ec2_name = "AZ2_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
-  enable_local_exec = true
-  enable_remote_exec = true
 }
 
 
@@ -219,7 +216,8 @@ module "NLB_privatesubnets" {
   source = "./loadbalancer-m"
   lb_name = "Nlb-for-private-subnet"
   lb_isinternal = true
-  lb_securitygroup = module.securitygroup_privatesub.tp_securitygroup_outputid
+  lb_targetgroup_name = "private-target-group"
+  lb_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
   lb_subnets = [module.az1_privatesubnet.subnet_outputid,module.az2_privatesubnet.subnet_outputid]
   lbtarget_vpc_id = module.vpc.tp_output_vpcid
   lb_type = "network"
@@ -230,30 +228,30 @@ module "NLB_privatesubnets" {
 }
 
 module "az1_private_ec2" {
-  source = "./instance-m"
-  tp_ec2_ami = data.aws_ami.amazon_linux.id
-  tp_ec2_instancetype = "t2.micro"
-  ec2_subnetid = module.az1_privatesubnet.subnet_outputid
-  ec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
-  ec2_associatepublicip = false
-  ec2_name = "AZ1_private_BackendServer"
-  ec2_target_group_arn = module.NLB_privatesubnet.alb_arn_output
+  source = "./privinstance-m"
+  tp_privateec2_ami = data.aws_ami.amazon_linux.id
+  tp_privateec2_instancetype = "t2.micro"
+  privateec2_subnetid = module.az1_privatesubnet.subnet_outputid
+  privateec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
+  privateec2_associatepublicip = false
+  privateec2_name = "AZ1_private_BackendServer"
+  privateec2_target_group_arn = module.NLB_privatesubnets.alb_arn_output
 
 }
 
 module "az2_private_ec2" {
-  source = "./instance-m"
-  tp_ec2_ami = data.aws_ami.amazon_linux.id
-  tp_ec2_instancetype = "t2.micro"
-  ec2_subnetid = module.az2_privatesubnet.subnet_outputid
-  ec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
-  ec2_associatepublicip = false
-  ec2_name = "AZ2_private_BackendServer"
-  ec2_target_group_arn = module.NLB_privatesubnet.alb_arn_output
+  source = "./privinstance-m"
+  tp_privateec2_ami = data.aws_ami.amazon_linux.id
+  tp_privateec2_instancetype = "t2.micro"
+  privateec2_subnetid = module.az2_privatesubnet.subnet_outputid
+  privateec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
+  privateec2_associatepublicip = false
+  privateec2_name = "AZ2_private_BackendServer"
+  privateec2_target_group_arn = module.NLB_privatesubnets.alb_arn_output
   
 }
 
 module "nat_gateway" {
   source = "./natgateway-m"
-  nat_subnetid = moduule.az1_publicsubnet.subnet_outputid
+  nat_subnetid = module.az1_publicsubnet.subnet_outputid
 }

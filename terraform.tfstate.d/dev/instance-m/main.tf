@@ -11,36 +11,25 @@ resource "aws_instance" "tp_ec2" {
 
   # Log public IPs to all-ips.txt
    # Dynamic block to conditionally add local-exec provisioner
-  dynamic "provisioner" {
-    for_each = var.enable_local_exec ? [1] : []  # Only create the provisioner if enabled
-    content {
-      type    = "local-exec"
+  provisioner "local-exec" {
       command = "echo ${var.ec2_name} ${self.public_ip} >> ~/.aws/all-ips.txt"
-    }
   }
 
   # Dynamic block to conditionally add remote-exec provisioner
-  dynamic "connection" {
-    for_each = var.enable_remote_exec ? [1] : []  # Only create connection if remote exec is enabled
-    content {
+  connection {
       type        = "ssh"
       user        = "ec2-user"
       private_key = file(var.private_key_path)
       host        = self.public_ip
-    }
   }
 
-  dynamic "provisioner" {
-    for_each = var.enable_remote_exec ? [1] : []  # Only create the provisioner if enabled
-    content {
-      type    = "remote-exec"
+  provisioner "remote-exec" {
       inline  = [
         "sudo apt-get update -y",
         "sudo apt-get install -y apache2",
         "sudo systemctl start apache2",
         "sudo systemctl enable apache2"
       ]
-    }
   }   
   }
 
