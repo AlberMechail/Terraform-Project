@@ -83,18 +83,18 @@ module "securitygroup_publicsub" {
   sg_ingress_rules = [ {
     from_port = 80
     to_port = 80
-    protocol = tcp
+    protocol = "tcp"
     cidr_blocks = "0.0.0.0/24"
   },
   {
     from_port = 443
     to_port = 443
-    protocol = tcp
+    protocol = "tcp"
     cidr_blocks = "0.0.0.0/24"
   },{
     from_port = 22
     to_port = 22
-    protocol = tcp
+    protocol = "tcp"
     cidr_blocks = "0.0.0.0/24"
   }
   ]
@@ -146,7 +146,7 @@ module "az1_public_ec2" {
   tp_ec2_instancetype = "t2.micro"
   ec2_subnetid = module.az1_publicsubnet.subnet_outputid
   ec2_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
-  ec2_associatepublicip = "10.0.0.100/24"
+  ec2_associatepublicip = true
   ec2_name = "AZ1_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
   enable_local_exec = true
@@ -160,7 +160,7 @@ module "az2_public_ec2" {
   tp_ec2_instancetype = "t2.micro"
   ec2_subnetid = module.az2_publicsubnet.subnet_outputid
   ec2_securitygroup = [module.securitygroup_publicsub.tp_securitygroup_outputid]
-  ec2_associatepublicip = "10.0.2.100/24"
+  ec2_associatepublicip = true
   ec2_name = "AZ2_public_ApacheServer"
   ec2_target_group_arn = module.Alb_publicsubnet.alb_arn_output
   enable_local_exec = true
@@ -209,7 +209,7 @@ module "securitygroup_privatesub" {
   sg_ingress_rules = [ {
     from_port = 22
     to_port = 22
-    protocol = tcp
+    protocol = "tcp"
     cidr_blocks = ["10.0.0.0/24","10.0.2.0/24"]
   }
   ]
@@ -233,11 +233,11 @@ module "az1_private_ec2" {
   source = "./instance-m"
   tp_ec2_ami = data.aws_ami.amazon_linux.id
   tp_ec2_instancetype = "t2.micro"
-  ec2_subnetid = module.az1_pprivatesubnet.subnet_outputid
+  ec2_subnetid = module.az1_privatesubnet.subnet_outputid
   ec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
-  ec2_associatepublicip = "10.0.1.100/24"
+  ec2_associatepublicip = false
   ec2_name = "AZ1_private_BackendServer"
-  ec2_target_group_arn = module.Alb_privatesubnet.alb_arn_output
+  ec2_target_group_arn = module.NLB_privatesubnet.alb_arn_output
 
 }
 
@@ -247,9 +247,9 @@ module "az2_private_ec2" {
   tp_ec2_instancetype = "t2.micro"
   ec2_subnetid = module.az2_privatesubnet.subnet_outputid
   ec2_securitygroup = [module.securitygroup_privatesub.tp_securitygroup_outputid]
-  ec2_associatepublicip = "10.0.3.100/24"
+  ec2_associatepublicip = false
   ec2_name = "AZ2_private_BackendServer"
-  ec2_target_group_arn = module.Alb_privatesubnet.alb_arn_output
+  ec2_target_group_arn = module.NLB_privatesubnet.alb_arn_output
   
 }
 
