@@ -41,6 +41,5 @@ variable "enable_remote_exec" {
 variable "private_key_path" {
   description = "Path to the SSH private key for remote-exec."
   type        = string
-  default     = "~/.ssh/id_rsa.pub" # Provide a default key or leave it empty
 }
 
