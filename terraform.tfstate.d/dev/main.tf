@@ -169,6 +169,35 @@ module "az2_public_ec2" {
 #Private Zone
 #########################
 
+module "private_routetable" {
+  source = "./routingt-m"
+  tp_rt_vpcid = module.vpc.tp_output_vpcid
+  rt_routes = [ 
+    {
+        cidr_block = "0.0.0.0/24"
+        nat_gateway_id = module.igw.igw_output_id
+
+    }
+   ]
+
+   tp_rt_name = "private_routetable"
+}
+
+
+module "associate_privateroutetable_az1" {
+    source = "./associatert-m"
+    assrt_subnetid = module.az1_privatesubnet.subnet_outputid
+    assrt_routetableid = module.private_routetable.tp_routingtable_outputid
+
+}
+
+module "associate_privateroutetable_az2" {
+    source = "./associatert-m"
+    assrt_subnetid = module.az2_privatesubnet.subnet_outputid
+    assrt_routetableid = module.private_routetable.tp_routingtable_outputid
+
+}
+
 module "securitygroup_privatesub" {
   source = "./sg-m"
   sg_name = "private-sg"
@@ -187,8 +216,8 @@ module "NLB_privatesubnets" {
   source = "./loadbalancer-m"
   lb_name = "Nlb-for-private-subnet"
   lb_isinternal = true
-  lb_securitygroup = module.securitygroup_publicsub.tp_securitygroup_outputid
-  lb_subnets = [module.az1_publicsubnet.subnet_outputid,module.az2_publicsubnet.subnet_outputid]
+  lb_securitygroup = module.securitygroup_privatesub.tp_securitygroup_outputid
+  lb_subnets = [module.az1_privatesubnet.subnet_outputid,module.az2_privatesubnet.subnet_outputid]
   lbtarget_vpc_id = module.vpc.tp_output_vpcid
   lb_type = "network"
   lb_listner_port = 22
@@ -219,4 +248,9 @@ module "az2_private_ec2" {
   ec2_name = "AZ2_private_BackendServer"
   ec2_target_group_arn = module.Alb_privatesubnet.alb_arn_output
   
+}
+
+module "nat_gateway" {
+  source = "./natgateway-m"
+  nat_subnetid = moduule.az1_publicsubnet.subnet_outputid
 }

@@ -41,7 +41,7 @@ resource "aws_instance" "tp_ec2" {
         "sudo systemctl enable apache2"
       ]
     }
-  }
+  }   
   }
 
   resource "aws_lb_target_group_attachment" "attach_lb_toInstance" {

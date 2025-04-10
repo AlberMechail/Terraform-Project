@@ -29,18 +29,18 @@ variable "ec2_target_group_arn" {
 variable "enable_local_exec" {
   description = "Whether to run the local-exec provisioner."
   type        = bool
-  default     = true  # Set to true to enable or false to disable
+  default     = false  # Set to true to enable or false to disable
 }
 
 variable "enable_remote_exec" {
   description = "Whether to run the remote-exec provisioner."
   type        = bool
-  default     = true  # Set to true to enable or false to disable
+  default     = false  # Set to true to enable or false to disable
 }
 
 variable "private_key_path" {
   description = "Path to the SSH private key for remote-exec."
   type        = string
-  default     = "~/terraform_project/labuser.pem" # Provide a default key or leave it empty
+  default     = "~/.ssh/id_rsa.pub" # Provide a default key or leave it empty
 }
 
